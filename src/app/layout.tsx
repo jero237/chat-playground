@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Dashboard from "@/components/side-bar";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import SideBar from "@/components/side-bar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +19,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <TooltipProvider>
+        <div className="grid h-screen w-full pl-[56px]">
+          <SideBar />
+          {children}
+          </div>
+        </TooltipProvider>
+      </body>
     </html>
   );
 }
