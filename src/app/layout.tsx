@@ -4,6 +4,7 @@ import "./globals.css";
 import Dashboard from "@/components/side-bar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import SideBar from "@/components/side-bar";
+import { ChatProvider } from "@/context/chat";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,10 +22,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <TooltipProvider>
-        <div className="grid h-screen w-full pl-[56px]">
-          <SideBar />
-          {children}
-          </div>
+          <ChatProvider>
+            <div className="grid h-screen w-full pl-[56px]">
+              <SideBar />
+              {children}
+            </div>
+          </ChatProvider>
         </TooltipProvider>
       </body>
     </html>

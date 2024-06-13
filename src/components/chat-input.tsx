@@ -1,47 +1,48 @@
-import { CornerDownLeft, Mic, Paperclip } from "lucide-react";
+"use client";
+import { CornerDownLeft, Mic, Paperclip, SendHorizonalIcon, SendIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { ChatContext } from "@/context/chat";
+import { useContext, useState } from "react";
 
 export default function ChatInput() {
+  const [message, setMessage] = useState("");
+  const { sendMessage, isLoading } = useContext(ChatContext);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (message) {
+      setMessage("");
+      sendMessage(message, "user");
+    }
+  };
+
   return (
     <form
-      className="relative overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
-      x-chunk="dashboard-03-chunk-1"
+      className="flex items-center gap-2"
+      onSubmit={handleSubmit}
     >
       <Label htmlFor="message" className="sr-only">
         Message
       </Label>
       <Textarea
         id="message"
+        name="message"
         placeholder="Type your message here..."
-        className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0"
+        // @ts-ignore
+        style={{ fieldSizing: "content" }}
+        className="h-full min-h-0 resize-none border rounded-lg p-3 shadow-none focus-visible:ring-0"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
       />
-      <div className="flex items-center p-3 pt-0">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Paperclip className="size-4" />
-              <span className="sr-only">Attach file</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top">Attach File</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Mic className="size-4" />
-              <span className="sr-only">Use Microphone</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top">Use Microphone</TooltipContent>
-        </Tooltip>
-        <Button type="submit" size="sm" className="ml-auto gap-1.5">
-          Send Message
-          <CornerDownLeft className="size-3.5" />
-        </Button>
-      </div>
+      <Button
+        type="submit"
+        disabled={isLoading}
+      >
+        <SendHorizonalIcon className="size-4" />
+      </Button>
     </form>
   );
 }
