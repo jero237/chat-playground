@@ -68,17 +68,18 @@ export default function ProductBadge({
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>{product?.name || "Producto inexistente"}</DrawerTitle>
+          <img
+            alt="Product image"
+            className="aspect-square rounded-md object-cover size-72 overflow-hidden m-auto"
+            src={product?.image || "https://placehold.co/600x400"}
+          />
           <DrawerDescription>
             {product?.description ||
               "A veces gpt alucina y se inventa productos"}
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter>
-          <img
-            alt="Product image"
-            className="aspect-square rounded-md object-cover size-72 overflow-hidden m-auto"
-            src={product?.image || "https://placehold.co/600x400"}
-          />
+          <p className="text-lg font-semibold">{product?.price}</p>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
