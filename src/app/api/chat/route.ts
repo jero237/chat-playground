@@ -1,12 +1,16 @@
-import OpenAI from "openai";
-import { ChatMessage } from "@/context/chat";
 import { searchProduct } from "@/actions/products";
 import { Product } from "@/types/product";
 import { WithId } from "mongodb";
+import OpenAI from "openai";
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+const functions = {
+  searchProduct: searchProduct,
+};
 
 function iteratorToStream(iterator: any) {
   return new ReadableStream({
@@ -22,24 +26,65 @@ function iteratorToStream(iterator: any) {
   });
 }
 
-async function* makeIterator(
-  messages: ChatMessage[],
-  searchResults?: WithId<Product>[]
-) {
+async function* makeIterator(messages: ChatCompletionMessageParam[]) {
   messages.unshift({
     role: "system",
-    content: `You are a helpful assistant that should recommend products based on the user's search query. Your answer should reference products from the following list if they are relevant for the user's query. You must reference them using the following format: ![name](ObjectId("ID OF THE PRODUCT")). Products: ${
-      JSON.stringify(searchResults) || "[]"
-    }`,
+    content: `You are a helpful assistant that should recommend products based on the user's search query. You must reference them using the following format: ![name](ObjectId("ID OF THE PRODUCT")). Thanks to that format the product will be retrieved from the db, so respect it and don't add any other information. `,
   });
-  console.log(messages[0]);
-  const stream = await openai.chat.completions.create({
+  const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
-    stream: true,
     messages,
+    tools: [
+      {
+        type: "function",
+        function: {
+          name: "searchProduct",
+          description: "Search for products on the database",
+          parameters: {
+            type: "object",
+            properties: {
+              searchTerm: {
+                type: "string",
+                description: "The search term to use",
+              },
+            },
+            required: ["searchTerm"],
+          },
+        },
+      },
+    ],
+    tool_choice: "auto",
   });
 
-  for await (const chunk of stream) {
+  const responseMessage = response.choices[0].message;
+  const toolCalls = responseMessage?.tool_calls;
+
+  if (toolCalls) {
+    messages.push(responseMessage);
+    for (const call of toolCalls) {
+      const functionName = call.function?.name;
+      if (!functionName || !call.id) continue;
+      // @ts-ignore
+      const functionToCall = functions[functionName];
+      const functionArgs = JSON.parse(call.function?.arguments);
+      const functionResponse = await functionToCall(functionArgs.searchTerm);
+      messages.push({
+        tool_call_id: call.id,
+        role: "tool",
+        content: JSON.stringify(functionResponse),
+      });
+    }
+  }
+
+  const secondStream = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages,
+    stream: true,
+  });
+
+  console.log(JSON.stringify(messages)); 
+
+  for await (const chunk of secondStream) {
     if (chunk.choices[0]?.delta?.content) {
       yield new TextEncoder().encode(chunk.choices[0].delta.content);
     }
@@ -47,11 +92,10 @@ async function* makeIterator(
 }
 
 export async function POST(req: Request) {
-  const { messages } = (await req.json()) as { messages: ChatMessage[] };
-  const searchResults = await searchProduct(
-    messages[messages.length - 1].content
-  );
-  const iterator = makeIterator(messages, searchResults?.products);
+  const { messages } = (await req.json()) as {
+    messages: ChatCompletionMessageParam[];
+  };
+  const iterator = makeIterator(messages);
   const stream = iteratorToStream(iterator);
 
   return new Response(stream);

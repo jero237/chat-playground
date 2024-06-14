@@ -1,14 +1,11 @@
 "use client";
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { createContext, useState } from "react";
 
-export interface ChatMessage {
-  content: string;
-  role: "assistant" | "user" | "system";
-}
 
 interface ChatContextType {
-  messages: ChatMessage[];
-  sendMessage: (content: string, type: ChatMessage["role"]) => void;
+  messages: ChatCompletionMessageParam[];
+  sendMessage: (content: string, type: ChatCompletionMessageParam["role"]) => void;
   isLoading: boolean;
 }
 
@@ -20,14 +17,14 @@ export const ChatContext: React.Context<ChatContextType> =
   });
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const sendMessage = async (content: string, role: ChatMessage["role"]) => {
+  const sendMessage = async (content: string) => {
     setIsLoading(true);
     setMessages([
       ...messages,
-      { content, role },
+      { role: "user", content },
       { content: "", role: "assistant" },
     ]);
     const res = await fetch("/api/chat", {
@@ -35,7 +32,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ messages: [...messages, { content, role }] }),
+      body: JSON.stringify({ messages: [...messages, { content, role: "user" }] }),
     });
 
     if (res.body) {
