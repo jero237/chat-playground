@@ -52,7 +52,7 @@ export default function ChatBubble({
             return (
               <>
                 <ProductBadge name={match.name} productId={match.id} />
-                <Markdown>{part}</Markdown>
+                {part}
               </>
             );
           })}
