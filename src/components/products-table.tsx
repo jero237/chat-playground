@@ -21,7 +21,7 @@ import { Button } from "./ui/button";
 
 export default function ProductsTable({ products }: { products: Product[] }) {
   return (
-    <Card>
+    <Card className="mx-4">
       <CardHeader>
         <CardTitle>Products</CardTitle>
         <CardDescription>

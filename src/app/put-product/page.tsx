@@ -14,9 +14,9 @@ import { Input } from "@/components/ui/input";
 export default async function PutProductPage() {
   const products = await getProducts();
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4">
       <Header title="Put Product" />
-      <Card className="">
+      <Card className="mx-4">
         <CardHeader>
           <CardTitle>Create Product</CardTitle>
           <CardDescription>Adds a new product to MongoDB</CardDescription>
