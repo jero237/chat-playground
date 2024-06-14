@@ -3,7 +3,7 @@ import { createContext, useState } from "react";
 
 export interface ChatMessage {
   content: string;
-  role: "assistant" | "user";
+  role: "assistant" | "user" | "system";
 }
 
 interface ChatContextType {

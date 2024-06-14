@@ -1,10 +1,8 @@
 "use server";
+import clientPromise from "@/lib/mongodb";
 import { Product } from "@/types/product";
-import { MongoClient } from "mongodb";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-
-const client = new MongoClient(process.env.MONGODB_URI!);
 
 const schema = z.object({
   name: z.string(),
@@ -38,10 +36,11 @@ export const putProduct = async (formData: FormData) => {
   };
 
   try {
-    await client.connect();
+    const client = await clientPromise;
     const db = client.db("chat");
     const collection = db.collection("products");
     await collection.insertOne(product);
+    revalidatePath("/put-product");
     return {
       success: true,
     };
@@ -50,18 +49,12 @@ export const putProduct = async (formData: FormData) => {
     return {
       error: "Something went wrong while adding the product to the database",
     };
-  } finally {
-    client.close();
-    revalidatePath("/put-product");
-    return {
-      success: true,
-    };
   }
 };
 
 export const getProducts = async () => {
   try {
-    await client.connect();
+    const client = await clientPromise;
     const db = client.db("chat");
     const collection = db.collection<Product>("products");
     const products = await collection.find().toArray();
@@ -72,9 +65,27 @@ export const getProducts = async () => {
   } catch (error) {
     console.error(error);
     return {
-      error: "Something went wrong while getting the products from the database",
+      error:
+        "Something went wrong while getting the products from the database",
     };
-  } finally {
-    client.close();
+  }
+};
+
+export const searchProduct = async (searchTerm: string) => {
+  try {
+    const client = await clientPromise;
+    const db = client.db("chat");
+    const collection = db.collection<Product>("products");
+    const products = await collection.find({ $text: { $search: searchTerm } }).toArray();
+    return {
+      success: true,
+      products,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      error:
+        "Something went wrong while searching the products from the database",
+    };
   }
 };
