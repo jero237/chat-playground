@@ -4,12 +4,8 @@ import { cva } from "class-variance-authority";
 import { BotIcon, UserIcon } from "lucide-react";
 import ProductBadge from "./product-badge";
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import Markdown from "react-markdown";
 
-export default function ChatBubble({
-  content,
-  role,
-}: ChatMessage) {
+export default function ChatBubble({ content, role }: ChatMessage) {
   const bubbleVariants = cva("text-sm", {
     variants: {
       role: {
