@@ -76,7 +76,7 @@ export default function ProductBadge({
         <DrawerFooter>
           <img
             alt="Product image"
-            className="aspect-square rounded-md object-cover size-72 overflow-hidden"
+            className="aspect-square rounded-md object-cover size-72 overflow-hidden m-auto"
             src={product?.image || "https://placehold.co/600x400"}
           />
         </DrawerFooter>
