@@ -2,16 +2,18 @@ import { BotIcon, UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { ChatMessage } from "@/context/chat";
 import ProductBadge from "./product-badge";
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
-export default function ChatBubble({ content, role }: ChatMessage) {
+export default function ChatBubble({ content, role }: ChatCompletionMessageParam) {
   const bubbleVariants = cva("text-sm", {
     variants: {
       role: {
         user: "rounded-lg bg-blue-100 p-3 dark:bg-blue-900 dark:text-white",
         assistant: "pl-3 pr-1",
         system: "hidden",
+        tool: "hidden",
+        function: "hidden",
       },
     },
     defaultVariants: {
@@ -20,8 +22,8 @@ export default function ChatBubble({ content, role }: ChatMessage) {
   });
 
   const regex = /!\[.+\]\(ObjectId\("\w+"\)\)/gi;
-  const parts = content.split(regex);
-  const matches = content.match(regex);
+  const parts = (content as string).split(regex);
+  const matches = (content as string).match(regex);
 
   return (
     <div

@@ -29,7 +29,7 @@ function iteratorToStream(iterator: any) {
 async function* makeIterator(messages: ChatCompletionMessageParam[]) {
   messages.unshift({
     role: "system",
-    content: `You are a helpful assistant that should recommend products based on the user's search query. You must reference them using the following format: ![name](ObjectId("ID OF THE PRODUCT")). Thanks to that format the product will be retrieved from the db, so respect it and don't add any other information. `,
+    content: `You are a helpful assistant that should recommend products based on the user's search query. You must reference them using the following format: ![name](ObjectId("ID OF THE PRODUCT")). Thanks to that format the product will be retrieved from the db, so respect it and only add info that is on the function call. `,
   });
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
