@@ -79,7 +79,7 @@ export default function ProductBadge({
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter>
-          <p className="text-lg font-semibold">{product?.price}</p>
+          <p className="text-xl m-auto font-semibold">${product?.price}</p>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
