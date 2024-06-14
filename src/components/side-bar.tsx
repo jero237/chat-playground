@@ -1,4 +1,4 @@
-import { Github, SquareTerminal, Triangle } from "lucide-react";
+import { Github, PlusIcon, SquareTerminal, Triangle } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -20,35 +20,33 @@ export default function SideBar() {
       <nav className="grid gap-1 p-2">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-lg bg-muted"
+            <Link
+              href={"/"}
+              className={cn("rounded-lg bg-muted", buttonVariants({ variant: "ghost", size: "icon" }))}
               aria-label="Playground"
             >
               <SquareTerminal className="size-5" />
-            </Button>
+            </Link>
           </TooltipTrigger>
           <TooltipContent side="right" sideOffset={5}>
             Playground
           </TooltipContent>
         </Tooltip>
-        {/* <Tooltip>
+        <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-lg"
-              aria-label="Models"
+            <Link
+              href={"/put-product"}
+              className={cn("rounded-lg bg-muted", buttonVariants({ variant: "ghost", size: "icon" }))}
+              aria-label="Product"
             >
-              <Bot className="size-5" />
-            </Button>
+              <PlusIcon className="size-5" />
+            </Link>
           </TooltipTrigger>
           <TooltipContent side="right" sideOffset={5}>
             Models
           </TooltipContent>
         </Tooltip>
-        <Tooltip>
+        {/* <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
