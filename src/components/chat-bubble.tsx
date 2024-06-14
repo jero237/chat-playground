@@ -31,25 +31,26 @@ export default function ChatBubble({ content, role }: ChatMessage) {
       )}
     >
       <div className={bubbleVariants({ role })}>
-        {parts.map((part, index) => {
-          let match = {
-            name: "",
-            id: "",
-          };
-          if (matches && matches[index - 1]) {
-            const nameRegex = /(?<=!\[)(.*)(?=\])/;
-            const idRegex = /(?<=ObjectId\(")(.*)(?="\))/;
-            match.name = nameRegex.exec(matches[index - 1])?.[0] || "";
-            match.id = idRegex.exec(matches[index - 1])?.[0] || "";
-            matches.pop();
-          }
-          return (
-            <div className="whitespace-pre-line" key={index}>
-              <ProductBadge name={match.name} productId={match.id} />
+        <p className="whitespace-pre-line">
+          {parts.map((part, index) => {
+            let match = {
+              name: "",
+              id: "",
+            };
+            if (matches && matches[index - 1]) {
+              const nameRegex = /(?<=!\[)(.*)(?=\])/;
+              const idRegex = /(?<=ObjectId\(")(.*)(?="\))/;
+              match.name = nameRegex.exec(matches[index - 1])?.[0] || "";
+              match.id = idRegex.exec(matches[index - 1])?.[0] || "";
+            }
+            return (
+              <>
+                <ProductBadge name={match.name} productId={match.id} />
                 {part}
-            </div>
-          );
-        })}
+              </>
+            );
+          })}
+        </p>
       </div>
       <Avatar className="h-8 w-8">
         <AvatarFallback>
