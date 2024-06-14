@@ -14,7 +14,7 @@ export default function Chat() {
             {messages.map((message, index) => (
               <ChatBubble
                 key={index}
-                content={message.content}
+                content={message.content as string}
                 role={message.role}
               />
             ))}

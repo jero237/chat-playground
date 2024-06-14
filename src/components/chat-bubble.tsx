@@ -1,11 +1,15 @@
-import { BotIcon, UserIcon } from "lucide-react";
-import { Avatar, AvatarFallback } from "./ui/avatar";
-import { cva } from "class-variance-authority";
+import { ChatMessage } from "@/context/chat";
 import { cn } from "@/lib/utils";
+import { cva } from "class-variance-authority";
+import { BotIcon, UserIcon } from "lucide-react";
 import ProductBadge from "./product-badge";
-import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import Markdown from "react-markdown";
 
-export default function ChatBubble({ content, role }: ChatCompletionMessageParam) {
+export default function ChatBubble({
+  content,
+  role,
+}: ChatMessage) {
   const bubbleVariants = cva("text-sm", {
     variants: {
       role: {
@@ -48,7 +52,7 @@ export default function ChatBubble({ content, role }: ChatCompletionMessageParam
             return (
               <>
                 <ProductBadge name={match.name} productId={match.id} />
-                {part}
+                <Markdown>{part}</Markdown>
               </>
             );
           })}

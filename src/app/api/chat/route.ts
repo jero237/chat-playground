@@ -1,4 +1,5 @@
 import { searchProduct } from "@/actions/products";
+import { ChatMessage } from "@/context/chat";
 import { Product } from "@/types/product";
 import { WithId } from "mongodb";
 import OpenAI from "openai";
@@ -29,7 +30,7 @@ function iteratorToStream(iterator: any) {
 async function* makeIterator(messages: ChatCompletionMessageParam[]) {
   messages.unshift({
     role: "system",
-    content: `You are a helpful assistant that should recommend products based on the user's search query. You must reference them using the following format: ![name](ObjectId("ID OF THE PRODUCT")). Thanks to that format the product will be retrieved from the db, so respect it and only add info that is on the function call. `,
+    content: `You are a helpful assistant that should recommend products based on the user's search query. You must reference them using the following format: ![name](ObjectId("ID OF THE PRODUCT")). Thanks to that format the product will be retrieved from the db, so respect it. Don't add info that is on the function call but add your personal opinion so the responses are fun.`,
   });
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
@@ -82,7 +83,7 @@ async function* makeIterator(messages: ChatCompletionMessageParam[]) {
     stream: true,
   });
 
-  console.log(JSON.stringify(messages)); 
+  console.log(JSON.stringify(messages));
 
   for await (const chunk of secondStream) {
     if (chunk.choices[0]?.delta?.content) {
@@ -93,7 +94,7 @@ async function* makeIterator(messages: ChatCompletionMessageParam[]) {
 
 export async function POST(req: Request) {
   const { messages } = (await req.json()) as {
-    messages: ChatCompletionMessageParam[];
+    messages: ChatMessage[];
   };
   const iterator = makeIterator(messages);
   const stream = iteratorToStream(iterator);
