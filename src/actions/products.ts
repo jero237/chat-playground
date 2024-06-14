@@ -1,6 +1,7 @@
 "use server";
 import clientPromise from "@/lib/mongodb";
 import { Product } from "@/types/product";
+import { ObjectId } from "mongodb";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -86,6 +87,25 @@ export const searchProduct = async (searchTerm: string) => {
     return {
       error:
         "Something went wrong while searching the products from the database",
+    };
+  }
+};
+
+export const getProduct = async (id: string) => {
+  try {
+    const client = await clientPromise;
+    const db = client.db("chat");
+    const collection = db.collection<Product>("products");
+    const product = await collection.findOne({ _id: new ObjectId(id) });
+    return {
+      success: true,
+      product,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      error:
+        "Something went wrong while getting the product from the database",
     };
   }
 };

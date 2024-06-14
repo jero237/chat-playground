@@ -28,9 +28,9 @@ async function* makeIterator(
 ) {
   messages.unshift({
     role: "system",
-    content: `You are a helpful assistant that should recommend products based on the user's search query. Your answer should reference products from the following list if they are relevant for the user's query: ${
+    content: `You are a helpful assistant that should recommend products based on the user's search query. Your answer should reference products from the following list if they are relevant for the user's query. You must reference them using the following format: ![name](ObjectId("ID OF THE PRODUCT")). Products: ${
       JSON.stringify(searchResults) || "[]"
-    } You must reference them using the following format: ![product](ObjectId("ID OF THE PRODUCT"))`,
+    }`,
   });
   console.log(messages[0]);
   const stream = await openai.chat.completions.create({

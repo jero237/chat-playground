@@ -3,22 +3,25 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { ChatMessage } from "@/context/chat";
+import ProductBadge from "./product-badge";
 
-export default function ChatBubble({
-  content,
-  role,
-}: ChatMessage) {
+export default function ChatBubble({ content, role }: ChatMessage) {
   const bubbleVariants = cva("text-sm", {
     variants: {
       role: {
         user: "rounded-lg bg-blue-100 p-3 dark:bg-blue-900 dark:text-white",
         assistant: "pl-3 pr-1",
+        system: "hidden",
       },
     },
     defaultVariants: {
       role: "user",
     },
   });
+
+  const regex = /!\[.+\]\(ObjectId\("\w+"\)\)/gi;
+  const parts = content.split(regex);
+  const matches = content.match(regex);
 
   return (
     <div
@@ -28,7 +31,25 @@ export default function ChatBubble({
       )}
     >
       <div className={bubbleVariants({ role })}>
-        <p className="whitespace-pre-line">{content || "..."}</p>
+        {parts.map((part, index) => {
+          let match = {
+            name: "",
+            id: "",
+          };
+          if (matches && matches[index - 1]) {
+            const nameRegex = /(?<=!\[)(.*)(?=\])/;
+            const idRegex = /(?<=ObjectId\(")(.*)(?="\))/;
+            match.name = nameRegex.exec(matches[index - 1])?.[0] || "";
+            match.id = idRegex.exec(matches[index - 1])?.[0] || "";
+            matches.pop();
+          }
+          return (
+            <div className="whitespace-pre-line" key={index}>
+              <ProductBadge name={match.name} productId={match.id} />
+                {part}
+            </div>
+          );
+        })}
       </div>
       <Avatar className="h-8 w-8">
         <AvatarFallback>
