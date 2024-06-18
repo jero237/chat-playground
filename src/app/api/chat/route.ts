@@ -30,7 +30,24 @@ function iteratorToStream(iterator: any) {
 async function* makeIterator(messages: ChatCompletionMessageParam[]) {
   messages.unshift({
     role: "system",
-    content: `You are a helpful assistant that should recommend products based on the user's search query. You must reference them using the following format: ![name](ObjectId("ID OF THE PRODUCT")). Thanks to that format the product will be retrieved from the db, so respect it. Don't add info that is on the function call but add your personal opinion so the responses are fun.`,
+    content: `INSTRUCTIONS:
+    - You must answer based on the function response.
+    - You must return a list of products that match the search query.
+    - You must reference them using the following format: ![name](ObjectId("ID OF THE PRODUCT")).
+    - Thanks to that format the product will be retrieved from the db, so respect it.
+    - Add a short description of the product based on the function response and make it funnier and use emojis.
+    - Don't include list characters like "1." or "-". 
+    
+    Example:
+    \`\`\`
+       User: I want to buy a new phone
+       Assistant: Great! Here are some phones that you could like:
+       ![iPhone 12](ObjectId("5f8ef5d4d0ee0d2e4e2d1e0"))
+         The iPhone 12 is a great phone for those who want a premium experience.
+       ![Samsung Galaxy S21](ObjectId("5f8ef5d4d0ee0d2e4e2d1e1"))
+         The Samsung Galaxy S21 is a great phone for those who want a stylish and powerful experience.
+    \`\`\`
+    `,
   });
   const response = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",

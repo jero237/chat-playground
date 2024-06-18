@@ -2,7 +2,7 @@ import { ChatMessage } from "@/context/chat";
 import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import { BotIcon, UserIcon } from "lucide-react";
-import ProductBadge from "./product-badge";
+import ProductCard from "./product-card";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
 export default function ChatBubble({ content, role }: ChatMessage) {
@@ -47,7 +47,7 @@ export default function ChatBubble({ content, role }: ChatMessage) {
             }
             return (
               <>
-                <ProductBadge name={match.name} productId={match.id} />
+                <ProductCard name={match.name} productId={match.id} />
                 {part}
               </>
             );

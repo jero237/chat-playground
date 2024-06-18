@@ -1,13 +1,19 @@
 "use client";
-import { ChatCompletionAssistantMessageParam, ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
-import { createContext, useState } from "react";
+import {
+  ChatCompletionAssistantMessageParam,
+  ChatCompletionUserMessageParam,
+} from "openai/resources/index.mjs";
+import { createContext, useEffect, useState } from "react";
 
-export type ChatMessage = ChatCompletionAssistantMessageParam | ChatCompletionUserMessageParam;
+export type ChatMessage =
+  | ChatCompletionAssistantMessageParam
+  | ChatCompletionUserMessageParam;
 
 export interface ChatContextType {
   messages: ChatMessage[];
   sendMessage: (content: string, type: ChatMessage["role"]) => void;
   isLoading: boolean;
+  clearMessages: () => void;
 }
 
 export const ChatContext: React.Context<ChatContextType> =
@@ -15,11 +21,28 @@ export const ChatContext: React.Context<ChatContextType> =
     messages: [],
     sendMessage: () => {},
     isLoading: false,
+    clearMessages: () => {},
   });
 
 export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const storedMessages = localStorage.getItem("chatMessages");
+    if (storedMessages) {
+      setMessages(JSON.parse(storedMessages));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (messages.length) localStorage.setItem("chatMessages", JSON.stringify(messages));
+  }, [messages]);
+
+  const clearMessages = () => {
+    setMessages([]);
+    localStorage.removeItem("chatMessages");
+  }
 
   const sendMessage = async (content: string) => {
     setIsLoading(true);
@@ -33,7 +56,9 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ messages: [...messages, { content, role: "user" }] }),
+      body: JSON.stringify({
+        messages: [...messages, { content, role: "user" }],
+      }),
     });
 
     if (res.body) {
@@ -60,7 +85,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <ChatContext.Provider value={{ messages, sendMessage, isLoading }}>
+    <ChatContext.Provider value={{ messages, sendMessage, isLoading, clearMessages }}>
       {children}
     </ChatContext.Provider>
   );
