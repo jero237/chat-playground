@@ -54,7 +54,7 @@ export default function ProductCard({
     );
 
   return (
-    <Card className="group relative h-32 transition-all hover:shadow-md md:max-w-96 hover:cursor-pointer">
+    <Card className="group relative h-32 transition-all hover:shadow-md md:max-w-max hover:cursor-pointer">
       <Link
         href="https://youtube.com/watch?v=dQw4w9WgXcQ"
         target="_blank"
